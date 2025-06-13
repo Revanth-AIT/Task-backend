@@ -4,23 +4,25 @@ import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schemas/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { ProductQueueProducerService } from './queues/queue.producer.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
+    private readonly queue: ProductQueueProducerService,
   ) {}
 
-  // CREATE
   async createProduct(dto: CreateProductDto, imagePaths: string[]) {
     const product = new this.productModel({
       ...dto,
       images: imagePaths,
     });
-    return product.save();
+    const savedProduct = await product.save();
+    await this.queue.addProductJob({ action: 'indexToSearch', id: savedProduct._id });
+    return savedProduct;
   }
 
-  // READ ALL WITH FILTERS
   async findWithFilters(query: any) {
     const filter: any = {};
     if (query.name) {
@@ -35,12 +37,14 @@ export class ProductsService {
     return this.productModel.find(filter).exec();
   }
 
-  // READ ONE BY ID
   async findOne(id: string) {
-    return this.productModel.findById(id).exec();
+    const product = await this.productModel.findById(id);
+    if (!product) {
+      throw new NotFoundException('Product not found');
+    }
+    return product;
   }
 
-  // UPDATE
   async updateProduct(id: string, dto: UpdateProductDto, imagePaths: string[]) {
     const product = await this.productModel.findById(id);
     if (!product) {
@@ -53,15 +57,17 @@ export class ProductsService {
       product.images = imagePaths;
     }
 
-    return product.save();
+    const updated = await product.save();
+    await this.queue.addProductJob({ action: 'updateIndex', id: updated._id });
+    return updated;
   }
 
-  // DELETE
   async deleteProduct(id: string) {
     const result = await this.productModel.findByIdAndDelete(id);
     if (!result) {
       throw new NotFoundException('Product not found');
     }
+    await this.queue.addProductJob({ action: 'removeFromSearch', id });
     return { message: 'Product deleted successfully' };
   }
 }

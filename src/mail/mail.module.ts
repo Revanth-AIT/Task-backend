@@ -7,4 +7,4 @@ import { MailController } from './mail.controller';
   providers: [MailService],
   exports: [MailService],
 })
-export class MailModule {} // ✅ This must match the import in app.module.ts
+export class MailModule {}

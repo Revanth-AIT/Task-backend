@@ -22,7 +22,6 @@ import * as fs from 'fs';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  // CREATE
   @Post()
   @UseInterceptors(
     FilesInterceptor('images', 10, {
@@ -47,19 +46,16 @@ export class ProductsController {
     return this.productsService.createProduct(dto, imagePaths);
   }
 
-  // READ ALL WITH FILTERS
   @Get()
   async findAllWithFilters(@Query() query: any) {
     return this.productsService.findWithFilters(query);
   }
 
-  // READ ONE BY ID
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
   }
 
-  // UPDATE
   @Put(':id')
   @UseInterceptors(
     FilesInterceptor('images', 10, {
@@ -85,7 +81,6 @@ export class ProductsController {
     return this.productsService.updateProduct(id, dto, imagePaths);
   }
 
-  // DELETE
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return this.productsService.deleteProduct(id);
