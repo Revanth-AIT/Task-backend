@@ -6,7 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
 import { MailModule } from './mail/mail.module';
 import { CronModule } from './cron/cron.module';
-import { QueueModule } from './cron/queues/queue.module'; // ✅ CORRECT
+import { QueueModule } from './cron/queues/queue.module'; 
 import { ProductQueueModule } from './products/queues/queue.module';
 
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
