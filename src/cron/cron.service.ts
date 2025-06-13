@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { QueueProducerService } from './queues/queue.producer.service'; // ✅
+import { QueueProducerService } from './queues/queue.producer.service'; 
 
 @Injectable()
 export class CronService {
